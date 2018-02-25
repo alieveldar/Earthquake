@@ -2,6 +2,8 @@ package bignerdranch.android.earthquake;
 
 import android.icu.text.SimpleDateFormat;
 import android.location.Location;
+import android.os.Build;
+import android.support.annotation.RequiresApi;
 
 import java.util.Date;
 
@@ -44,6 +46,7 @@ public class Quake {
     public String getLink() {
         return link;
     }
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public String toString(){
         SimpleDateFormat sdf = new SimpleDateFormat("HH.mm");

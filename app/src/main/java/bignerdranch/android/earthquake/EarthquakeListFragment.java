@@ -1,12 +1,13 @@
 package bignerdranch.android.earthquake;
 
 import android.app.ListFragment;
+import android.content.Context;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
-import android.provider.DocumentsContract;
 import android.util.Log;
 import android.widget.ArrayAdapter;
+import android.widget.Toast;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -34,26 +35,28 @@ import javax.xml.parsers.ParserConfigurationException;
  */
 
 public class EarthquakeListFragment extends ListFragment {
-    ArrayAdapter<Quake> mQuakeArrayAdapter;
-    ArrayList<Quake> mQuakeArrayList = new ArrayList<Quake>();
+
+    ArrayAdapter<Quake> aa;
+    ArrayList<Quake> earthquakes = new ArrayList<Quake>();
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState){
         super.onActivityCreated(savedInstanceState);
 
         int layOutId = android.R.layout.simple_list_item_1;
-        mQuakeArrayAdapter = new ArrayAdapter<Quake>(getActivity(), layOutId, mQuakeArrayList);
-        setListAdapter(mQuakeArrayAdapter);
+        aa = new ArrayAdapter<Quake>(getActivity(), layOutId, earthquakes);
+        setListAdapter(aa);
         Thread t = new Thread(new Runnable() {
             @Override
             public void run() {
                 refreshEarthQuakes();
+
             }
         });
         t.start();
     }
 
-    private static final String  TAG = "EARTQUAKE";
+    private static final String  TAG = "EARTHQUAKE";
     private Handler mHandler = new Handler();
     public void refreshEarthQuakes(){
         URL url;
@@ -66,15 +69,22 @@ public class EarthquakeListFragment extends ListFragment {
             int responseCode = httpURLConnection.getResponseCode();
 
             if (responseCode == HttpURLConnection.HTTP_OK){
-                InputStream in = httpURLConnection.getInputStream();
+                //Log.d("Earthquake", "HTTTP IS OK");
 
+
+                InputStream in = httpURLConnection.getInputStream();
+              //  Log.d("Earthquake", "INPUT STREAM IS OK");
                 DocumentBuilderFactory dbf  = DocumentBuilderFactory.newInstance();
                 DocumentBuilder db = dbf.newDocumentBuilder();
                 Document dom = db.parse(in);
                 Element docEle = dom.getDocumentElement();
-                mQuakeArrayList.clear();
-                NodeList nl = docEle.getElementsByTagName("entry");
+
+                earthquakes.clear();
+               // Log.d("Earthquake", "earthquakelist is clear IS OK");
+                NodeList nl = docEle.getElementsByTagName("event");
+               // Log.d("Earthquake", nl.getClass().toString());
                 if (nl != null && nl.getLength() > 0) {
+                   // Log.d("Earthquake", "Node list is not empty");
                     for (int i =0 ; i < nl.getLength(); i++) {
                         Element entry = (Element)nl.item(i);
                         Element title = (Element)entry.getElementsByTagName("title").item(0);
@@ -133,8 +143,8 @@ public class EarthquakeListFragment extends ListFragment {
         }
     }
     private void addNewQuake(Quake _quake) {
-        mQuakeArrayList.add(_quake);
-        mQuakeArrayAdapter.notifyDataSetChanged();
+        earthquakes.add(_quake);
+        aa.notifyDataSetChanged();
     }
 
 }
