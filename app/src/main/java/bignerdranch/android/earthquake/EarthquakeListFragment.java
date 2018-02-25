@@ -87,18 +87,18 @@ public class EarthquakeListFragment extends ListFragment {
                    // Log.d("Earthquake", "Node list is not empty");
                     for (int i =0 ; i < nl.getLength(); i++) {
                         Element entry = (Element)nl.item(i);
-                        Element title = (Element)entry.getElementsByTagName("title").item(0);
-                        Element g =(Element)entry.getElementsByTagName("georss:point").item(0);
-                        Element when = (Element)entry.getElementsByTagName("updated").item(0);
-                        Element link = (Element)entry.getElementsByTagName("link").item(0);
+                        Element title = (Element)entry.getElementsByTagName("time").item(0);
+                        Element g =(Element)entry.getElementsByTagName("longitude").item(0);
+                        Element when = (Element)entry.getElementsByTagName("longitude").item(0);
+                        Element link = (Element)entry.getElementsByTagName("longitude").item(0);
 
-                        String details = title.getFirstChild().getNodeValue();
+                        String details = "no details"; //title.getFirstChild().getNodeValue();
                         String hostname = "http://earthquake.usgs.goov";
-                        String linkString = hostname + link.getAttribute("href");
-
-                        String point = g.getFirstChild().getNodeValue();
-                        String dt = when.getFirstChild().getNodeValue();
-                        SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-dd'T'hh:mm:ss'Z'");
+                     //   String linkString = hostname + link.getAttribute("href");
+                            String linkString = "www.google.com";
+                        String point =  "MOSCOW";   //g.getFirstChild().getNodeValue();
+                        String dt = "20121201";  //when.getFirstChild().getNodeValue();
+                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy");
                         Date qdate = new GregorianCalendar(0,0,0).getTime();
                         try {
                             qdate = sdf.parse(dt);
@@ -109,13 +109,14 @@ public class EarthquakeListFragment extends ListFragment {
 
                         String[] location = point.split(" ");
                         Location l = new Location("dummyGPS");
-                        l.setLatitude(Double.parseDouble(location[0]));
-                        l.setLongitude(Double.parseDouble(location[1]));
+                        //l.setLatitude(Double.parseDouble(location[0]));
+                        //l.setLongitude(Double.parseDouble(location[1]));
 
                         String magnitudeString = details.split(" ")[1];
                         int end =magnitudeString.length() -1 ;
-                        Double magnitude = Double.parseDouble(magnitudeString.substring(0, end));
-                        details = details.split(",")[1].trim();
+                        Double magnitude = 4.00; //Double.parseDouble(magnitudeString.substring(0, end));
+   //                     details = details.split(",")[1].trim();
+
                         final Quake quake = new Quake(qdate, details, l,  magnitude, linkString);
 
                         mHandler.post(new Runnable() {

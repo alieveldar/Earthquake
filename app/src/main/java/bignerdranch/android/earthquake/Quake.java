@@ -49,9 +49,9 @@ public class Quake {
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public String toString(){
-        SimpleDateFormat sdf = new SimpleDateFormat("HH.mm");
-        String dateString = sdf.format(mDate);
-        return dateString + ": " + magnitude + " " + detalis;
+//        SimpleDateFormat sdf = new SimpleDateFormat("HH.mm");
+  //      String dateString = sdf.format(mDate);
+        return "test" + ": " + magnitude + " " + detalis;
 
     }
 }
