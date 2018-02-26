@@ -1,13 +1,12 @@
 package bignerdranch.android.earthquake;
 
 import android.app.ListFragment;
-import android.content.Context;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.DocumentsContract;
 import android.util.Log;
 import android.widget.ArrayAdapter;
-import android.widget.Toast;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -35,28 +34,26 @@ import javax.xml.parsers.ParserConfigurationException;
  */
 
 public class EarthquakeListFragment extends ListFragment {
-
-    ArrayAdapter<Quake> aa;
-    ArrayList<Quake> earthquakes = new ArrayList<Quake>();
+    ArrayAdapter<Quake> mQuakeArrayAdapter;
+    ArrayList<Quake> mQuakeArrayList = new ArrayList<Quake>();
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState){
         super.onActivityCreated(savedInstanceState);
 
         int layOutId = android.R.layout.simple_list_item_1;
-        aa = new ArrayAdapter<Quake>(getActivity(), layOutId, earthquakes);
-        setListAdapter(aa);
+        mQuakeArrayAdapter = new ArrayAdapter<Quake>(getActivity(), layOutId, mQuakeArrayList);
+        setListAdapter(mQuakeArrayAdapter);
         Thread t = new Thread(new Runnable() {
             @Override
             public void run() {
                 refreshEarthQuakes();
-
             }
         });
         t.start();
     }
 
-    private static final String  TAG = "EARTHQUAKE";
+    private static final String  TAG = "EARTQUAKE";
     private Handler mHandler = new Handler();
     public void refreshEarthQuakes(){
         URL url;
@@ -69,36 +66,29 @@ public class EarthquakeListFragment extends ListFragment {
             int responseCode = httpURLConnection.getResponseCode();
 
             if (responseCode == HttpURLConnection.HTTP_OK){
-                //Log.d("Earthquake", "HTTTP IS OK");
-
-
                 InputStream in = httpURLConnection.getInputStream();
-              //  Log.d("Earthquake", "INPUT STREAM IS OK");
+
                 DocumentBuilderFactory dbf  = DocumentBuilderFactory.newInstance();
                 DocumentBuilder db = dbf.newDocumentBuilder();
                 Document dom = db.parse(in);
                 Element docEle = dom.getDocumentElement();
-
-                earthquakes.clear();
-               // Log.d("Earthquake", "earthquakelist is clear IS OK");
+                mQuakeArrayList.clear();
                 NodeList nl = docEle.getElementsByTagName("event");
-               // Log.d("Earthquake", nl.getClass().toString());
                 if (nl != null && nl.getLength() > 0) {
-                   // Log.d("Earthquake", "Node list is not empty");
                     for (int i =0 ; i < nl.getLength(); i++) {
                         Element entry = (Element)nl.item(i);
-                        Element title = (Element)entry.getElementsByTagName("time").item(0);
-                        Element g =(Element)entry.getElementsByTagName("longitude").item(0);
-                        Element when = (Element)entry.getElementsByTagName("longitude").item(0);
-                        Element link = (Element)entry.getElementsByTagName("longitude").item(0);
+                        Element title = (Element)entry.getElementsByTagName("mag").item(0);
+                        Element g =(Element)entry.getElementsByTagName("evaluationMode").item(0);
+                        Element when = (Element)entry.getElementsByTagName("time").item(0);
+                        Element link = (Element)entry.getElementsByTagName("creationInfo").item(0);
 
-                        String details = "no details"; //title.getFirstChild().getNodeValue();
+                        String details = title.getFirstChild().getFirstChild().getNodeValue();
                         String hostname = "http://earthquake.usgs.goov";
-                     //   String linkString = hostname + link.getAttribute("href");
-                            String linkString = "www.google.com";
-                        String point =  "MOSCOW";   //g.getFirstChild().getNodeValue();
-                        String dt = "20121201";  //when.getFirstChild().getNodeValue();
-                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy");
+                        String linkString = hostname + link.getAttribute("href");
+
+                        String point = g.getFirstChild().getNodeValue();
+                        String dt = when.getFirstChild().getFirstChild().getNodeValue();
+                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss'Z'");
                         Date qdate = new GregorianCalendar(0,0,0).getTime();
                         try {
                             qdate = sdf.parse(dt);
@@ -107,16 +97,17 @@ public class EarthquakeListFragment extends ListFragment {
                             Log.d(TAG, "Dateparsing exception", e);
                         }
 
-                        String[] location = point.split(" ");
-                        Location l = new Location("dummyGPS");
+                        //String[] location = point.split(" ");
+                        //Location l = new Location("dummyGPS");
                         //l.setLatitude(Double.parseDouble(location[0]));
                         //l.setLongitude(Double.parseDouble(location[1]));
+                        String l = "someone";
 
-                        String magnitudeString = details.split(" ")[1];
+                        String magnitudeString = details;
                         int end =magnitudeString.length() -1 ;
-                        Double magnitude = 4.00; //Double.parseDouble(magnitudeString.substring(0, end));
-   //                     details = details.split(",")[1].trim();
-
+                       // Double magnitude = Double.parseDouble(magnitudeString.substring(0, end));
+                        String magnitude = magnitudeString;
+                        //details = details.split(",")[1].trim();
                         final Quake quake = new Quake(qdate, details, l,  magnitude, linkString);
 
                         mHandler.post(new Runnable() {
@@ -144,8 +135,8 @@ public class EarthquakeListFragment extends ListFragment {
         }
     }
     private void addNewQuake(Quake _quake) {
-        earthquakes.add(_quake);
-        aa.notifyDataSetChanged();
+        mQuakeArrayList.add(_quake);
+        mQuakeArrayAdapter.notifyDataSetChanged();
     }
 
 }
