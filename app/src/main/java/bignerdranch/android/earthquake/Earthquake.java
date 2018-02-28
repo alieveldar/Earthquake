@@ -1,5 +1,7 @@
 package bignerdranch.android.earthquake;
 
+import android.app.Activity;
+import android.app.FragmentManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -29,7 +31,14 @@ public boolean onCreateOptionsMenu(Menu menu){
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
+        updateFromPreferences();
+
+
     }
+
+
+
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -64,6 +73,25 @@ public boolean onCreateOptionsMenu(Menu menu){
         minimumMagnitude = Integer.valueOf(minMagValues[minMagIndex]);
         updateFreq = Integer.valueOf(freqValues[freqIndex]);
 
+
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int rezultCode, Intent  data ){
+        super.onActivityResult(requestCode, requestCode, data);
+        if (requestCode == SHOW_PREFERENCES)
+            if (requestCode == Activity.RESULT_OK) {
+            updateFromPreferences();
+                FragmentManager fm = getFragmentManager();
+                final EarthquakeListFragment earthQuakeList = (EarthquakeListFragment)fm.findFragmentById(R.id.Earthquakelistfragment);
+                Thread t = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        earthQuakeList.refreshEarthQuakes();
+                    }
+                });
+                t.start();
+            }
     }
 
 }

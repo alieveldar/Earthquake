@@ -2,6 +2,7 @@ package bignerdranch.android.earthquake;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.os.Bundle;
@@ -51,7 +52,7 @@ public class PreferencesActivity extends Activity {
 
         populateSpinners();
 
-        Context context = getApplicationContext();
+        final Context context = getApplicationContext();
         pref = PreferenceManager.getDefaultSharedPreferences(context);
         updateUIFFromPrefereces();
 
