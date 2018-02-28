@@ -13,10 +13,10 @@ public class Quake {
     private Date mDate;
     private String detalis;
     private String mLocation;
-    private String magnitude;
+    private Double magnitude;
     private String link;
 
-    public Quake(Date date, String detalis, String location, String magnitude, String link) {
+    public Quake(Date date, String detalis, String location, Double magnitude, String link) {
         mDate = date;
         this.detalis = detalis;
         mLocation = location;
@@ -37,7 +37,7 @@ public class Quake {
         return mLocation;
     }
 
-    public String getMagnitude() {
+    public Double getMagnitude() {
         return magnitude;
     }
 
@@ -49,7 +49,7 @@ public class Quake {
     public String toString(){
 //        SimpleDateFormat sdf = new SimpleDateFormat("HH.mm");
   //      String dateString = sdf.format(mDate);
-        return mDate + ": " + magnitude + " " + detalis + " : " +mLocation;
+        return mDate + ": " + magnitude + " " + detalis + " : " + mLocation;
 
     }
 }

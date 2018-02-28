@@ -1,4 +1,9 @@
 <resources>
     <string name="app_name">Earthquake</string>
     <string name="quake_feed">https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_day.quakeml</string>
+    <string name="menu_update">Refresh Earth Quakes</string>
+    <string name="aut_update_prompt">Auto Update?</string>
+    <string name="update_frequency_prompt">Update Frequency</string>
+    <string name="min_quake_mag_prompt">Minimum Quake Magnitude</string>
+    <string name="menu_preferences">Preferences</string>
 </resources>

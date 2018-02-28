@@ -105,8 +105,8 @@ public class EarthquakeListFragment extends ListFragment {
 
                         String magnitudeString = details;
                         int end =magnitudeString.length() -1 ;
-                       // Double magnitude = Double.parseDouble(magnitudeString.substring(0, end));
-                        String magnitude = magnitudeString;
+                       Double magnitude = Double.parseDouble(magnitudeString);
+                        //String magnitude = magnitudeString;
                         //details = details.split(",")[1].trim();
                         final Quake quake = new Quake(qdate, details, l,  magnitude, linkString);
 
@@ -135,7 +135,13 @@ public class EarthquakeListFragment extends ListFragment {
         }
     }
     private void addNewQuake(Quake _quake) {
-        mQuakeArrayList.add(_quake);
+        Earthquake earthquakeActivity = (Earthquake)getActivity();
+        Double tetst_quakemag = _quake.getMagnitude();
+        int testearthmag = earthquakeActivity.minimumMagnitude;
+        if (_quake.getMagnitude() > earthquakeActivity.minimumMagnitude) {
+            mQuakeArrayList.add(_quake);
+        }
+
         mQuakeArrayAdapter.notifyDataSetChanged();
     }
 
