@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
+import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -28,14 +29,11 @@ public boolean onCreateOptionsMenu(Menu menu){
     return true;
 }
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
         updateFromPreferences();
-
-
     }
-
 
 
 
@@ -57,21 +55,10 @@ public boolean onCreateOptionsMenu(Menu menu){
         Context context = getApplicationContext();
         SharedPreferences spref = PreferenceManager.getDefaultSharedPreferences(context);
 
-        int minMagIndex = spref.getInt(PreferencesActivity.PREF_MIN_MAG_INDEX, 0);
-        if (minMagIndex < 0)
-            minMagIndex = 0;
-
-        int freqIndex = spref.getInt(PreferencesActivity.PREF_UPDATE_FREQ_INDEX,0);
-        if (freqIndex < 0)
-            freqIndex = 0;
-
+        minimumMagnitude = Integer.parseInt(spref.getString(PreferencesActivity.PREF_MIN_MAG, "3"));
+        updateFreq = Integer.parseInt(spref.getString(PreferencesActivity.PREF_UPDATE_FREQ, "60"));
         autoUpdateChecked = spref.getBoolean(PreferencesActivity.PREF_AUTO_UPDDATE, false);
-        Resources r = getResources();
-        String[] minMagValues = r.getStringArray(R.array.magnitude);
-        String[] freqValues = r.getStringArray(R.array.update_freg_values);
 
-        minimumMagnitude = Integer.valueOf(minMagValues[minMagIndex]);
-        updateFreq = Integer.valueOf(freqValues[freqIndex]);
 
 
     }
@@ -80,10 +67,11 @@ public boolean onCreateOptionsMenu(Menu menu){
     public void onActivityResult(int requestCode, int rezultCode, Intent  data ){
         super.onActivityResult(requestCode, requestCode, data);
         if (requestCode == SHOW_PREFERENCES)
-            if (requestCode == Activity.RESULT_OK) {
             updateFromPreferences();
+
                 FragmentManager fm = getFragmentManager();
                 final EarthquakeListFragment earthQuakeList = (EarthquakeListFragment)fm.findFragmentById(R.id.Earthquakelistfragment);
+
                 Thread t = new Thread(new Runnable() {
                     @Override
                     public void run() {
@@ -91,7 +79,7 @@ public boolean onCreateOptionsMenu(Menu menu){
                     }
                 });
                 t.start();
-            }
+
     }
 
 }
