@@ -22,6 +22,9 @@
         <activity android:name=".PreferencesActivity"
             android:label="Earth Quake Preferences" >
         </activity>
+        <provider
+            android:authorities="com.bignerdranch.earthquakeprovider"
+            android:name=".EarthquakeProvider" ></provider>
     </application>
 
 </manifest>

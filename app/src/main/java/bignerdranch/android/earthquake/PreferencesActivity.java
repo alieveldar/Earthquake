@@ -23,7 +23,7 @@ public class PreferencesActivity extends PreferenceActivity {
 
     @Override
     public void onCreate(Bundle savedInstanceState){
-        super.onCreate(savedInstanceState);
+            super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.userpreferences);
     }
 
