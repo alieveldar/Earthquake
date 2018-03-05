@@ -1,6 +1,9 @@
 package bignerdranch.android.earthquake;
 
 import android.app.ListFragment;
+import android.content.ContentResolver;
+import android.content.ContentValues;
+import android.database.Cursor;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
@@ -135,14 +138,26 @@ public class EarthquakeListFragment extends ListFragment {
         }
     }
     private void addNewQuake(Quake _quake) {
-        Earthquake earthquakeActivity = (Earthquake)getActivity();
-        Double tetst_quakemag = _quake.getMagnitude();
-        int testearthmag = earthquakeActivity.minimumMagnitude;
-        if (_quake.getMagnitude() > earthquakeActivity.minimumMagnitude) {
-            mQuakeArrayList.add(_quake);
-        }
+        ContentResolver cr = getActivity().getContentResolver();
+        String w = EarthquakeProvider.KEY_DATE + " = " + _quake.getDate().getTime();
 
-        mQuakeArrayAdapter.notifyDataSetChanged();
+        Cursor query =  cr.query(EarthquakeProvider.CONTENT_URI, null, w, null, null);
+        if (query.getCount()==0){
+            ContentValues values = new ContentValues();
+            values.put(EarthquakeProvider.KEY_DATE, _quake.getDate().getTime());
+            values.put(EarthquakeProvider.KEY_SUMMARY, _quake.toString());
+
+            double lat = _quake.getLocation().getLatitude();
+            double lng = _quake.getLocation().getLongtitude();
+            values.put(EarthquakeProvider.KEY_LOCATION_LAT, lat);
+            values.put(EarthquakeProvider.KEY_LOCATION_LNG, lng);
+            values.put(EarthquakeProvider.KEY_LINK, _quake.getLink());
+            values.put(EarthquakeProvider.KEY_MAGNITUDE, _quake.getMagnitude());
+
+            cr.insert(EarthquakeProvider.CONTENT_URI, values);
+
+        }
+        query.close();
     }
 
 }
