@@ -1,5 +1,6 @@
 package bignerdranch.android.earthquake;
 
+import android.app.SearchManager;
 import android.content.ContentProvider;
 import android.content.ContentUris;
 import android.content.ContentValues;
@@ -15,6 +16,8 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
+
+import java.util.HashMap;
 
 /**
  * Created by modus on 3/5/18.
@@ -33,14 +36,26 @@ public class EarthquakeProvider extends ContentProvider {
     public static final String KEY_MAGNITUDE = "magnitude";
     public static final String KEY_LINK = "link";
 
+    private static final HashMap<String, String> SEARCH_PROJECTION_MAP;
+    static {
+        SEARCH_PROJECTION_MAP = new HashMap<String, String>();
+        SEARCH_PROJECTION_MAP.put(SearchManager.SUGGEST_COLUMN_TEXT_1, KEY_SUMMARY + " AS " + SearchManager.SUGGEST_COLUMN_TEXT_1);
+        SEARCH_PROJECTION_MAP.put("_id", KEY_ID + " AS " + "_id");
+    }
+
     private static final int QUAKES = 1;
     private static final int QUAKE_ID = 2;
+    private static final int SEARCH = 3;
     private static final UriMatcher uriMAtcher;
 
     static {
         uriMAtcher = new UriMatcher(UriMatcher.NO_MATCH);
         uriMAtcher.addURI("com.bignerdranch.earthquakeprovider", "earthquakes", QUAKES);
         uriMAtcher.addURI("com.bignerdranch.earthquakeprovider", "earthquakes/#", QUAKE_ID );
+        uriMAtcher.addURI("com.bignerdranch.earthquakeprovider", SearchManager.SUGGEST_URI_PATH_QUERY, SEARCH);
+        uriMAtcher.addURI("com.bignerdranch.earthquakeprovider", SearchManager.SUGGEST_URI_PATH_QUERY + "/*", SEARCH );
+        uriMAtcher.addURI("com.bignerdranch.earthquakeprovider", SearchManager.SUGGEST_URI_PATH_SHORTCUT, SEARCH);
+        uriMAtcher.addURI("com.bignerdranch.earthquakeprovider", SearchManager.SUGGEST_URI_PATH_SHORTCUT + "/*", SEARCH);
     }
 
 
@@ -63,7 +78,11 @@ public class EarthquakeProvider extends ContentProvider {
         switch (uriMAtcher.match(uri)){
             case QUAKE_ID: qb.appendWhere(KEY_ID + "=" + uri.getPathSegments().get(1));
             break;
-            default:break;
+            case SEARCH: qb.appendWhere(KEY_SUMMARY + " LIKE \"%" +uri.getPathSegments().get(1)
+            + "%\"");
+            qb.setProjectionMap(SEARCH_PROJECTION_MAP);
+            break;
+            default :break;
         }
         String orderBy;
         if (TextUtils.isEmpty(sort)){
@@ -83,6 +102,7 @@ public class EarthquakeProvider extends ContentProvider {
         switch (uriMAtcher.match(uri)){
             case QUAKES: return "vnd.android.cursor.dir/vnd.bignerdranch.earthquake";
             case QUAKE_ID: return  "vnd.android.cursos.dir/vnd.bignerdranch.earthquake";
+            case SEARCH: return SearchManager.SHORTCUT_MIME_TYPE;
             default: throw new IllegalArgumentException("Usuported uri : " + uri);
         }
 
@@ -149,7 +169,7 @@ public class EarthquakeProvider extends ContentProvider {
         private static final int DATABASE_VERSION = 1;
         private static final String EARTHQUAKE_TABLE = "earthquakes";
 
-        private static final String DATABASE_CREATE ="create table " + EARTHQUAKE_TABLE + " (" + KEY_ID + "integer primary key autoincrement, "
+        private static final String DATABASE_CREATE ="create table " + EARTHQUAKE_TABLE + " (" + KEY_ID + " integer primary key autoincrement, "
                 + KEY_DATE  + " INTEGER, "
                 + KEY_DETAILS + " TEXT, "
                 + KEY_SUMMARY + " TEXT, "

@@ -55,7 +55,7 @@ public boolean onCreateOptionsMenu(Menu menu){
         Context context = getApplicationContext();
         SharedPreferences spref = PreferenceManager.getDefaultSharedPreferences(context);
 
-        minimumMagnitude = Integer.parseInt(spref.getString(PreferencesActivity.PREF_MIN_MAG, "3"));
+        minimumMagnitude = Integer.parseInt(spref.getString(PreferencesActivity.PREF_MIN_MAG, "1"));
         updateFreq = Integer.parseInt(spref.getString(PreferencesActivity.PREF_UPDATE_FREQ, "60"));
         autoUpdateChecked = spref.getBoolean(PreferencesActivity.PREF_AUTO_UPDDATE, false);
 

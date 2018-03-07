@@ -1,5 +1,6 @@
 package bignerdranch.android.earthquake;
 
+import android.location.Location;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
 
@@ -12,11 +13,11 @@ import java.util.Date;
 public class Quake {
     private Date mDate;
     private String detalis;
-    private String mLocation;
+    private Location mLocation;
     private Double magnitude;
     private String link;
 
-    public Quake(Date date, String detalis, String location, Double magnitude, String link) {
+    public Quake(Date date, String detalis, Location location, Double magnitude, String link) {
         mDate = date;
         this.detalis = detalis;
         mLocation = location;
@@ -34,7 +35,8 @@ public class Quake {
     }
 
     public String getLocation() {
-        return mLocation;
+        String location = new String(String.valueOf(mLocation));
+        return location;
     }
 
     public Double getMagnitude() {
@@ -49,7 +51,7 @@ public class Quake {
     public String toString(){
 //        SimpleDateFormat sdf = new SimpleDateFormat("HH.mm");
   //      String dateString = sdf.format(mDate);
-        return mDate + ": " + magnitude + " " + detalis + " : " + mLocation;
+        return mDate + ": " + magnitude + " " + detalis;
 
     }
 }
