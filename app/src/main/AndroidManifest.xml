@@ -12,6 +12,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <meta-data
+            android:name="android.app.default_searchable"
+            android:value=".EarthquakeSearchResults" />
         <activity android:name=".Earthquake">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -22,6 +25,19 @@
         <activity android:name=".PreferencesActivity"
             android:label="Earth Quake Preferences" >
         </activity>
+        <activity android:name=".EarthQuakeSearchResullts"
+            android:label="Earth Quake search"
+            android:launchMode="singleTop">
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+            <meta-data
+                android:name="android.app.searchable"
+                android:resource="@xml/searchable"/>
+        </activity>
+
+
         <provider
             android:authorities="com.bignerdranch.earthquakeprovider"
             android:name=".EarthquakeProvider" ></provider>
