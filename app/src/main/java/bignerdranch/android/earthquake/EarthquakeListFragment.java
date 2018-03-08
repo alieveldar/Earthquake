@@ -74,110 +74,12 @@ public class EarthquakeListFragment extends ListFragment implements LoaderManage
                 getLoaderManager().restartLoader(0, null, EarthquakeListFragment.this);
             }
         });
-
-        URL url;
-        try {
-            String quakeFeed = getString(R.string.quake_feed);
-            url = new URL(quakeFeed);
-            URLConnection connection;
-            connection = url.openConnection();
-            HttpURLConnection httpURLConnection = (HttpURLConnection)connection;
-            int responseCode = httpURLConnection.getResponseCode();
-
-            if (responseCode == HttpURLConnection.HTTP_OK){
-                InputStream in = httpURLConnection.getInputStream();
-
-                DocumentBuilderFactory dbf  = DocumentBuilderFactory.newInstance();
-                DocumentBuilder db = dbf.newDocumentBuilder();
-                Document dom = db.parse(in);
-                Element docEle = dom.getDocumentElement();
-
-                NodeList nl = docEle.getElementsByTagName("event");
-                if (nl != null && nl.getLength() > 0) {
-                    for (int i =0 ; i < nl.getLength(); i++) {
-                        Element entry = (Element)nl.item(i);
-                        Element title = (Element)entry.getElementsByTagName("description").item(0);
-                        Element g =(Element)entry.getElementsByTagName("magnitude").item(0);
-                        Element when = (Element)entry.getElementsByTagName("time").item(0);
-                        Element longt = (Element)entry.getElementsByTagName("origin").item(0);
-                        Element latit = (Element)entry.getElementsByTagName("origin").item(0);
-                        Element link = (Element)entry.getElementsByTagName("creationInfo").item(0);
-
-                        String longtitude = longt.getElementsByTagName("longitude").item(0).getTextContent();
-                        String latitude = latit.getElementsByTagName("latitude").item(0).getTextContent();
-                        String details = title.getElementsByTagName("text").item(0).getTextContent();
-                        String mag = g.getElementsByTagName("mag").item(0).getFirstChild().getTextContent();
-                        String hostname = "http://earthquake.usgs.goov";
-                        String linkString = hostname + link.getAttribute("href");
-                        String dt = when.getFirstChild().getFirstChild().getNodeValue();
-                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss.S'Z'");
-                        //Date qdate = new GregorianCalendar(0,0,0).getTime();
-                        Date qdate = sdf.parse(dt);
-
-                        Double dlongtitude = new Double(longtitude);
-                        Double dlatitude = new Double(latitude);
-                        //String[] location = point.split(" ");
-                        Location l = new Location("dummyGPS");
-                        l.setLatitude(dlatitude);
-                        l.setLongitude(dlongtitude);
-
-
-
-                       // int end = magnitudeString.length() -1 ;
-                        Log.d("This is mag", mag);
-                       Double magnitude = new Double(mag);
-                        //String magnitude = magnitudeString;
-                        //details = details.split(",")[1].trim();
-                        final Quake quake = new Quake(qdate, details, l,  magnitude, linkString);
-
-                        mHandler.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                addNewQuake(quake);
-                            }
-                        });
-
-                    }
-                }
-            }
-
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ParserConfigurationException e) {
-            e.printStackTrace();
-        } catch (SAXException e) {
-            e.printStackTrace();
-        } catch (ParseException e) {
-            e.printStackTrace();
-        } finally {
-
-        }
     }
-    @TargetApi(Build.VERSION_CODES.N)
-    private void addNewQuake(Quake _quake) {
-        ContentResolver cr = getActivity().getContentResolver();
-        String w = EarthquakeProvider.KEY_DATE + " = " + _quake.getDate().getTime();
 
-        Cursor query =  cr.query(EarthquakeProvider.CONTENT_URI, null, w, null, null);
-        if (query.getCount()==0){
-            ContentValues values = new ContentValues();
-            values.put(EarthquakeProvider.KEY_DATE, _quake.getDate().getTime());
-            values.put(EarthquakeProvider.KEY_SUMMARY, _quake.toString());
 
-            String lat = "latitude";
-            String lng = "longtitude";
-            values.put(EarthquakeProvider.KEY_LOCATION_LAT, lat);
-            values.put(EarthquakeProvider.KEY_LOCATION_LNG, lng);
-            values.put(EarthquakeProvider.KEY_LINK, _quake.getLink());
-            values.put(EarthquakeProvider.KEY_MAGNITUDE, _quake.getMagnitude());
-
-            cr.insert(EarthquakeProvider.CONTENT_URI, values);
-
-        }
-        query.close();
     }
+    //@TargetApi(Build.VERSION_CODES.N)
+
 
 
     @Override

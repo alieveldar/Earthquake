@@ -41,6 +41,8 @@
         <provider
             android:authorities="com.bignerdranch.earthquakeprovider"
             android:name=".EarthquakeProvider" ></provider>
+        <service android:name=".EarthquakeService"
+            android:enabled="true"/>
     </application>
 
 </manifest>
