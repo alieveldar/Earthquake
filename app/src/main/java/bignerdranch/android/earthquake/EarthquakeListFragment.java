@@ -1,11 +1,11 @@
 package bignerdranch.android.earthquake;
 
-import android.annotation.TargetApi;
 import android.app.ListFragment;
 import android.app.LoaderManager;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.CursorLoader;
+import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.location.Location;
@@ -55,29 +55,13 @@ public class EarthquakeListFragment extends ListFragment implements LoaderManage
 
         getLoaderManager().initLoader(0, null, this);
 
-        Thread t = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                refreshEarthQuakes();
-            }
-        });
-
-        t.start();
+        refreshEarthQuakes();
     }
 
     private static final String  TAG = "EARTQUAKE";
-    private Handler mHandler = new Handler();
-    public void refreshEarthQuakes(){
-        mHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                getLoaderManager().restartLoader(0, null, EarthquakeListFragment.this);
-            }
-        });
-    }
 
 
-    }
+
     //@TargetApi(Build.VERSION_CODES.N)
 
 
@@ -105,5 +89,10 @@ public class EarthquakeListFragment extends ListFragment implements LoaderManage
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         adapter.swapCursor(null);
+    }
+
+    public void refreshEarthQuakes(){
+        getLoaderManager().restartLoader(0,null,EarthquakeListFragment.this);
+        getActivity().startService(new Intent(getActivity(), EarthquakeService.class));
     }
 }

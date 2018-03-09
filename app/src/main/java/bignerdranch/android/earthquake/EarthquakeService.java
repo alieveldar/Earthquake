@@ -3,11 +3,14 @@ package bignerdranch.android.earthquake;
 import android.app.Service;
 import android.content.ContentResolver;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.location.Location;
 import android.os.Build;
 import android.os.IBinder;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.util.Log;
@@ -20,12 +23,13 @@ import org.xml.sax.SAXException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -37,6 +41,49 @@ import javax.xml.parsers.ParserConfigurationException;
 
 public class EarthquakeService extends Service {
     private static final String TAG = "EARTHQUAKE_UPDATE_SERVICE";
+    private Timer updateTimer;
+
+
+    public int onStartommand(Intent intent, int flags, int startId) {
+        Context context = getApplicationContext();
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+
+        int updateFreq = Integer.parseInt(prefs.getString(PreferencesActivity.PREF_UPDATE_FREQ, "60"));
+        boolean autoUpdateChecked = prefs.getBoolean(PreferencesActivity.PREF_AUTO_UPDDATE, false);
+
+        updateTimer.cancel();
+        if (autoUpdateChecked) {
+            updateTimer = new Timer("earthquakeUpdates");
+            updateTimer.scheduleAtFixedRate(doreFresh, 0, updateFreq * 60 * 1000);
+        } else {
+            Thread t = new Thread(new Runnable() {
+                @RequiresApi(api = Build.VERSION_CODES.N)
+                @Override
+                public void run() {
+                    refreshEarthQuakes();
+                }
+            });
+            t.start();
+        }
+        return Service.START_STICKY;
+    };
+
+    private TimerTask doreFresh = new TimerTask() {
+        @RequiresApi(api = Build.VERSION_CODES.N)
+        @Override
+        public void run() {
+            refreshEarthQuakes();
+        }
+    };
+
+    @Override
+    public void onCreate(){
+        super.onCreate();
+        updateTimer = new Timer("earthquakeUpdates");
+    }
+
+
+
 
     @Nullable
     @Override
@@ -69,7 +116,7 @@ public class EarthquakeService extends Service {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
-    public void refreshQuakes() {
+    public void refreshEarthQuakes() {
 
         URL url;
         try {
