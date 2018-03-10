@@ -22,7 +22,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".PreferencesActivity"
+        <activity android:name=".FragmentPreferences"
             android:label="Earth Quake Preferences" >
         </activity>
         <activity android:name=".EarthQuakeSearchResullts"
@@ -30,7 +30,8 @@
             android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH"/>
-                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.ca
+                tegory.DEFAULT"/>
             </intent-filter>
             <meta-data
                 android:name="android.app.searchable"
@@ -40,9 +41,18 @@
 
         <provider
             android:authorities="com.bignerdranch.earthquakeprovider"
-            android:name=".EarthquakeProvider" ></provider>
+            android:name=".EarthquakeProvider" >
+
+        </provider>
         <service android:name=".EarthquakeService"
             android:enabled="true"/>
+        <receiver android:name=".EarthqakeAlarmReceiver">
+            <intent-filter>
+                <action android:name="com.bignerdranch.earthquake.ACTION_REFRESH_EARTHQUAKE_ALARM">
+
+                </action>
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

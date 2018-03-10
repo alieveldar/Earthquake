@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
+import android.os.Build;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
@@ -47,11 +48,14 @@ public boolean onCreateOptionsMenu(Menu menu){
 
 
     @Override
+
     public boolean onOptionsItemSelected(MenuItem item) {
         super.onOptionsItemSelected(item);
         switch (item.getItemId()) {
             case (MENU_PREFERENCES): {
-                Intent i = new Intent(this, PreferencesActivity.class);
+                Class c = Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB ?
+                        PreferenceActivity.class : FragmentPreferences.class;
+                Intent i = new Intent(this, c);
                 startActivityForResult(i, SHOW_PREFERENCES);
                 return true;
             }

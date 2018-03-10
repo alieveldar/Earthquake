@@ -1,5 +1,8 @@
 package bignerdranch.android.earthquake;
 
+import android.app.AlarmManager;
+import android.app.IntentService;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.ContentResolver;
 import android.content.ContentValues;
@@ -10,6 +13,7 @@ import android.database.Cursor;
 import android.location.Location;
 import android.os.Build;
 import android.os.IBinder;
+import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
@@ -39,47 +43,30 @@ import javax.xml.parsers.ParserConfigurationException;
  * Created by modus on 3/8/18.
  */
 
-public class EarthquakeService extends Service {
+public class EarthquakeService extends IntentService {
     private static final String TAG = "EARTHQUAKE_UPDATE_SERVICE";
-    private Timer updateTimer;
+
+    private AlarmManager alarmManager;
+    private PendingIntent alarmIntent;
+
+    public EarthquakeService(){
+        super("EarthquakeService");
+    }
+
+    public EarthquakeService(String name){
+        super(name);
+    }
 
 
-    public int onStartommand(Intent intent, int flags, int startId) {
-        Context context = getApplicationContext();
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
-        int updateFreq = Integer.parseInt(prefs.getString(PreferencesActivity.PREF_UPDATE_FREQ, "60"));
-        boolean autoUpdateChecked = prefs.getBoolean(PreferencesActivity.PREF_AUTO_UPDDATE, false);
-
-        updateTimer.cancel();
-        if (autoUpdateChecked) {
-            updateTimer = new Timer("earthquakeUpdates");
-            updateTimer.scheduleAtFixedRate(doreFresh, 0, updateFreq * 60 * 1000);
-        } else {
-            Thread t = new Thread(new Runnable() {
-                @RequiresApi(api = Build.VERSION_CODES.N)
-                @Override
-                public void run() {
-                    refreshEarthQuakes();
-                }
-            });
-            t.start();
-        }
-        return Service.START_STICKY;
-    };
-
-    private TimerTask doreFresh = new TimerTask() {
-        @RequiresApi(api = Build.VERSION_CODES.N)
-        @Override
-        public void run() {
-            refreshEarthQuakes();
-        }
-    };
 
     @Override
     public void onCreate(){
         super.onCreate();
-        updateTimer = new Timer("earthquakeUpdates");
+        alarmManager = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
+        String ALARM_ACTION = EarthqakeAlarmReceiver.ACTION_REFRESH_EARTHQUAKE_ALARM;
+        Intent intentToFire = new Intent(ALARM_ACTION);
+        alarmIntent = PendingIntent.getBroadcast(this, 0, intentToFire, 0);
     }
 
 
@@ -89,6 +76,26 @@ public class EarthquakeService extends Service {
     @Override
     public IBinder onBind(Intent intent) {
         return null;
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    @Override
+    protected void onHandleIntent(@Nullable Intent intent) {
+        Context context = getApplicationContext();
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+
+        int updateFreq = Integer.parseInt(prefs.getString(PreferencesActivity.PREF_UPDATE_FREQ, "60"));
+        boolean autoUpdateChecked = prefs.getBoolean(PreferencesActivity.PREF_AUTO_UPDDATE, false);
+
+
+        if (autoUpdateChecked) {
+            int alarmType = AlarmManager.ELAPSED_REALTIME_WAKEUP;
+            long timeToRefresh = SystemClock.elapsedRealtime() + updateFreq*60*1000;
+            alarmManager.setInexactRepeating(alarmType, timeToRefresh, updateFreq*60*1000, alarmIntent);
+        } else {
+            alarmManager.cancel(alarmIntent);
+            refreshEarthQuakes();
+        }
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
@@ -187,9 +194,7 @@ public class EarthquakeService extends Service {
             e.printStackTrace();
         } catch (ParseException e) {
             e.printStackTrace();
-        }
-        finally {
-
+        } finally {
         }
     }
 }
