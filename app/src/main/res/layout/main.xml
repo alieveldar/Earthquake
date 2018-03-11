@@ -18,11 +18,11 @@
             android:background="#FFF">
 
         </SearchView>
-        <fragment android:name="bignerdranch.android.earthquake.EarthquakeListFragment"
-            android:id="@+id/Earthquakelistfragment"
+        <FrameLayout android:name="bignerdranch.android.earthquake.EarthquakeListFragment"
+            android:id="@+id/EarthquakeFragmentContainer"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-        </fragment>
+        </FrameLayout>
     </LinearLayout>
 </android.support.constraint.ConstraintLayout>
