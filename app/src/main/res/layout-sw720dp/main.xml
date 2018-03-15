@@ -6,13 +6,7 @@
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-        <SearchView
-            android:id="@+id/searchView"
-            android:iconifiedByDefault="false"
-            android:background="#FFF"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-        </SearchView>
+
         <fragment
             android:id="@+id/Earthquakelistfragment"
             android:name="bignerdranch.android.earthquake.EarthquakeListFragment"
